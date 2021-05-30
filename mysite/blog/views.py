@@ -10,6 +10,35 @@ from django.views.generic import (TemplateView,ListView,
 
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+import json
+import requests
+
+from django.http import Http404
+from rest_framework.views import APIView
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.http import JsonResponse
+from django.core import serializers
+from django.conf import settings
+import json
+
+
+class NewsDataView(TemplateView):
+    template_name = 'newsdata.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        news_data = requests.get(
+            'https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=0527da99aef34157a79213e341df51e4')
+        context['newsdata'] = json.dumps(news_data.json(),
+                                         sort_keys=True,
+                                         indent=4)
+        return context
+
+
+# context['newsdata'] is now a json string
 
 class AboutView(TemplateView):
     template_name = 'about.html'
@@ -55,6 +84,8 @@ class DraftListView(LoginRequiredMixin,ListView):
 class PostDeleteView(LoginRequiredMixin,DeleteView):
     model = Post
     success_url = reverse_lazy('post_list')
+
+
 
 #######################################
 ## Functions that require a pk match ##
