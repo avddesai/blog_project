@@ -24,7 +24,7 @@
 
 
 
-<body class='loader'>
+<body class=''>
 
 
   <nav class="navbar navbar-default techfont custom-navbar">
@@ -32,7 +32,7 @@
 
 
       <ul class="nav navbar-nav">
-        <li><a class='navbar-brand bigbrand' href="{% url 'post_list' %}">Blogs & News</a></li>
+        <li><a class='navbar-brand bigbrand' href="{% url 'post_list' %}">Blogs</a></li>
         <!-- <li><a href="{% url 'about'%}">About</a></li> -->
         <!-- <li><a href="https://www.github.com">Github</a></li> -->
         <!-- <li><a href="https://www.linkedin.com">LinkedIn</a></li> -->
@@ -52,7 +52,7 @@
           <a href="{% url 'logout' %}" >Log out</a>
         </li>
         <li>
-          <a href="{% url 'newsdata' %}" >News</a>
+          <a href="{% url 'Home' %}" >News</a>
         </li>
         <li>
           <a >Welcome: {{ user.username }}</a>

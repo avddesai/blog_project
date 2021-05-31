@@ -23,20 +23,95 @@ from django.core import serializers
 from django.conf import settings
 import json
 
+# class NewsDataView(TemplateView):
+#     template_name = 'newsdata.html'
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#
+#         news_data = requests.get(
+#             'https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=0527da99aef34157a79213e341df51e4')
+#         context['newsdata'] = json.dumps(news_data.json(),
+#                                          sort_keys=True,
+#                                          indent=4)
+#         return context
+def loadcontent(request):
+    try:
+        page = request.GET.get('page', 1)
+        search = request.GET.get('search', None)
+        # url = "https://newsapi.org/v2/everything?q={}&sortBy={}&page={}&apiKey={}".format(
+        #     "Technology","popularity",page,settings.APIKEY
+        # )
+        if search is None or search=="top":
+            url = "https://newsapi.org/v2/top-headlines?country={}&page={}&apiKey={}".format(
+                "us",page,settings.APIKEY
+            )
+        else:
+            url = "https://newsapi.org/v2/everything?q={}&sortBy={}&page={}&apiKey={}".format(
+                search,"popularity",page,settings.APIKEY
+            )
+        print("url:",url)
+        r = requests.get(url=url)
 
-class NewsDataView(TemplateView):
-    template_name = 'newsdata.html'
+        data = r.json()
+        if data["status"] != "ok":
+            return JsonResponse({"success":False})
+        data = data["articles"]
+        context = {
+            "success": True,
+            "data": [],
+            "search": search
+        }
+        for i in data:
+            context["data"].append({
+                "title": i["title"],
+                "description":  "" if i["description"] is None else i["description"],
+                "url": i["url"],
+                "image": temp_img if i["urlToImage"] is None else i["urlToImage"],
+                "publishedat": i["publishedAt"]
+            })
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        return JsonResponse(context)
+    except Exception as e:
+        return JsonResponse({"success":False})
 
-        news_data = requests.get(
-            'https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=0527da99aef34157a79213e341df51e4')
-        context['newsdata'] = json.dumps(news_data.json(),
-                                         sort_keys=True,
-                                         indent=4)
-        return context
+def home(request):
+    page = request.GET.get('page', 1)
+    search = request.GET.get('search', None)
+    temp_img='https://www.google.com/imgres?imgurl=https%3A%2F%2Fwww.thermaxglobal.com%2Fwp-content%2Fuploads%2F2020%2F05%2Fimage-not-found.jpg&imgrefurl=https%3A%2F%2Fwww.thermaxglobal.com%2Farticles%2Fchiller-for-a-packaging-manufacturer%2Fimage-not-found%2F&tbnid=AOnge19M6SFX_M&vet=12ahUKEwjn_5GBrvHwAhUryXMBHQiZB7gQMygBegUIARC2AQ..i&docid=97ZB1ZHEHBs6vM&w=1280&h=720&q=image%20not%20found&ved=2ahUKEwjn_5GBrvHwAhUryXMBHQiZB7gQMygBegUIARC2AQ'
 
+    if search is None or search=="top":
+        # get the top news
+        url = "https://newsapi.org/v2/top-headlines?country={}&page={}&apiKey={}".format(
+            "us",1,settings.APIKEY
+        )
+    else:
+        # get the search query request
+        url = "https://newsapi.org/v2/everything?q={}&sortBy={}&page={}&apiKey={}".format(
+            search,"popularity",page,settings.APIKEY
+        )
+    r = requests.get(url=url)
+
+    data = r.json()
+    if data["status"] != "ok":
+        return HttpResponse("<h1>Request Failed</h1>")
+    data = data["articles"]
+    context = {
+        "success": True,
+        "data": [],
+        "search": search
+    }
+    # seprating the necessary data
+    for i in data:
+        context["data"].append({
+            "title": i["title"],
+            "description":  "" if i["description"] is None else i["description"],
+            "url": i["url"],
+            "image": temp_img if i["urlToImage"] is None else i["urlToImage"],
+            "publishedat": i["publishedAt"]
+        })
+    # send the news feed to template in context
+    return render(request, 'index.html', context=context)
 
 # context['newsdata'] is now a json string
 

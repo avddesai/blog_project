@@ -33,10 +33,13 @@
   font-size: 1.5em;
 }
 
+.post{
+  border-width: 2px;
+}
 
 /*COLOR CHANGER*/
 /*Credit and Source: http://codepen.io/thapliyalshivam/pen/dvgXVO*/
-.loader{
+/* .loader{
   filter:hue-rotate(0deg);
   color: linear-gradient(45deg,#0f8,#08f);
   animation:hue 5000ms infinite linear;
@@ -70,4 +73,4 @@
   0%{filter: hue-rotate(0deg);}
   100%{filter:hue-rotate(360deg);}
 
-}
+} */
